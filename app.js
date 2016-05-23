@@ -59,6 +59,26 @@ app.use(function(req, res, next) {
    next();
 });
 
+app.use(function(req, res, next) {
+  if (!req.session.user) { 
+    	next();
+  }
+  else {
+      if (!req.session.timeout) {
+        req.session.timeout = new Date().getTime();
+      }
+	    var tiempo_actual = new Date().getTime();
+      if (tiempo_actual - req.session.user.timeout  > 120000){
+	      delete req.session.user;
+	      res.redirect('/session');
+	    } 
+      else {
+	      req.session.user.timeout = tiempo_actual;
+	      next();
+      }
+  }
+});
+
 app.use('/', routes);
 
 // catch 404 and forward to error handler
